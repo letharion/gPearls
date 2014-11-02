@@ -3,6 +3,9 @@
 import sys, getopt
 import Image, ImageDraw
 
+class ColorRegister:
+    index = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+
 # This is the colors of the pearls used by the original software
 colors = [
     (0x17, 0x20, 0x29),(0x48, 0x3f, 0x38),
@@ -64,7 +67,7 @@ def findMatchingColor(color):
     return closest
 
 
-def generate(im, size, offset, dest):
+def generate(im, size, offset, dest, colorCount):
     width = size[0]
     height = size[1]
     pw = im.size[0] / width
@@ -85,11 +88,18 @@ def generate(im, size, offset, dest):
     data = im.getdata()
             
     print "Generating image..."
+    if colorCount != "":
+        colorIndex = ColorRegister()
+
     for y in range(height):
         for x in range(width):
             mean = getMeanColor(data, im.size, x*pw, y*ph, pw, ph)
             index = findMatchingColor(mean)
             color = colors[index]
+
+            if colorCount != "":
+              colorIndex.index[index] += 1
+
             draw.rectangle([(x*tw, y*th), ((x+1)*tw, (y+1)*th)], fill=color) 
             size = draw.textsize(str(index+1))
             
@@ -104,6 +114,12 @@ def generate(im, size, offset, dest):
     del draw
 
 
+    print colorCount
+    if colorCount != "":
+        f = open(colorCount, 'a')
+        f.write("\t".join(str(x) for x in colorIndex.index) + "\n")
+
+
     if dest:
         target.save(dest, "JPEG")
     target.show()
@@ -114,10 +130,11 @@ def help():
     print ""
     print "Usage gPearl [-s size] [-o offset] [-d dest] <IMAGE>"
     print ""
-    print "  -h, --help   This help screen"
-    print "  -s, --size   The size of the pearlplate (default is 30x30)"
-    print "  -d, --dest   The location of the output file"
-    print "  -o, --offset The offset to use of the original image (deafult is 0x0)"
+    print "  -h, --help       This help screen."
+    print "  -s, --size       The size of the pearlplate (default is 30x30)."
+    print "  -d, --dest       The location of the output file."
+    print "  -o, --offset     The offset to use of the original image (deafult is 0x0)."
+    print "  -c, --colorcount The location of the colorcount output file. Data is always appended."
     print ""
     sys.exit(0)
 
@@ -134,7 +151,7 @@ def parse(v):
         sys.exit(-1)
 
 try:
-    optlist, args = getopt.getopt(sys.argv[1:], 'hs:o:d:', ['help', 'size=', 'offset=', 'dest='])
+    optlist, args = getopt.getopt(sys.argv[1:], 'hs:o:d:c:', ['help', 'size=', 'offset=', 'dest=', 'colorcount='])
 
     if len(args) != 1:
         help()
@@ -144,6 +161,7 @@ try:
     size = (30, 30)
     offset = (0, 0)
     dest = None
+    colorCount = ""
 
     for k,v in optlist:
         if k in ('-h', '--help'):
@@ -154,6 +172,8 @@ try:
             offset = parse(v)
         if k in ('-d', '--dest'):
             dest = v
+        if k in ('-c', '--colorcount'):
+            colorCount = v
 
     print "Using image: " + image
     print "  Size: " + str(size)
@@ -163,7 +183,7 @@ try:
 
 
     im = Image.open(image)
-    generate(im, size, offset, dest)
+    generate(im, size, offset, dest, colorCount)
 except Exception, e:
     print "Error: ", e
     help()
