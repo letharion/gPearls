@@ -67,7 +67,7 @@ def findMatchingColor(color):
     return closest
 
 
-def generate(im, size, offset, dest, colorCount):
+def generate(im, size, offset, dest, colorCount, mirror):
     width = size[0]
     height = size[1]
     pw = im.size[0] / width
@@ -100,13 +100,21 @@ def generate(im, size, offset, dest, colorCount):
             if colorCount != "":
               colorIndex.index[index] += 1
 
-            draw.rectangle([(x*tw, y*th), ((x+1)*tw, (y+1)*th)], fill=color) 
+            if (mirror):
+                 draw.rectangle([( (width - x) * tw, y*th), ((width - x - 1) * tw, (y+1)*th)], fill=color)
+            else:
+                 draw.rectangle([(x*tw, y*th), ((x+1)*tw, (y+1)*th)], fill=color)
+
             size = draw.textsize(str(index+1))
             
             ox = (pw-size[0]) / 2
             oy = (ph-size[1]) / 2
 
-            text_x = x * tw + ox
+            if (mirror):
+                text_x = (width - x - 1) * tw + ox + 2
+            else:
+                text_x = x * tw + ox
+
             text_y = y * th + oy
             draw.text((text_x, text_y - 1), str(index+1), fill=0x000000)
             draw.text((text_x, text_y + 1), str(index+1), fill=0x000000)
@@ -152,7 +160,7 @@ def parse(v):
         sys.exit(-1)
 
 try:
-    optlist, args = getopt.getopt(sys.argv[1:], 'hs:o:d:c:', ['help', 'size=', 'offset=', 'dest=', 'colorcount='])
+    optlist, args = getopt.getopt(sys.argv[1:], 'mhs:o:d:c:', ['help', 'size=', 'offset=', 'dest=', 'colorcount=', 'mirror'])
 
     if len(args) != 1:
         help()
@@ -163,6 +171,7 @@ try:
     offset = (0, 0)
     dest = None
     colorCount = ""
+    mirror = False
 
     for k,v in optlist:
         if k in ('-h', '--help'):
@@ -175,6 +184,8 @@ try:
             dest = v
         if k in ('-c', '--colorcount'):
             colorCount = v
+        if k in ('-m', '--mirror'):
+            mirror = True
 
     print "Using image: " + image
     print "  Size: " + str(size)
@@ -184,7 +195,7 @@ try:
 
 
     im = Image.open(image)
-    generate(im, size, offset, dest, colorCount)
+    generate(im, size, offset, dest, colorCount, mirror)
 except Exception, e:
     print "Error: ", e
     help()
