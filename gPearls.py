@@ -111,11 +111,11 @@ def generate(im, size, offset, dest, colorCount, mirror):
             oy = (ph-size[1]) / 2
 
             if (mirror):
-                text_x = (width - x - 1) * tw + ox + 2
+                text_x = (width - x - 1) * tw + ox + 2 + (size[0] / 2)
             else:
-                text_x = x * tw + ox
+                text_x = x * tw + ox + (size[0] / 2)
 
-            text_y = y * th + oy
+            text_y = y * th + oy + (size[1] / 2)
             draw.text((text_x, text_y - 1), str(index+1), fill=0x000000)
             draw.text((text_x, text_y + 1), str(index+1), fill=0x000000)
             draw.text((text_x - 1, text_y), str(index+1), fill=0x000000)
