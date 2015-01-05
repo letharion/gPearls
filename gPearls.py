@@ -6,7 +6,7 @@ import Image, ImageDraw
 class ColorRegister:
     index = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
-# This is the colors of the pearls used by the original software
+# These are the pearl color used by the original PhotoPearls software
 colors = [
     (0x17, 0x20, 0x29),(0x48, 0x3f, 0x38),
     (0x57, 0x3b, 0x38),(0x80, 0x1f, 0x32),
@@ -106,13 +106,14 @@ def generate(im, size, offset, dest, colorCount):
             ox = (pw-size[0]) / 2
             oy = (ph-size[1]) / 2
 
-            draw.text((x*tw+ox, y*th+oy-1), str(index+1), fill=0x000000)
-            draw.text((x*tw+ox, y*th+oy+1), str(index+1), fill=0x000000)
-            draw.text((x*tw+ox-1, y*th+oy), str(index+1), fill=0x000000)
-            draw.text((x*tw+ox+1, y*th+oy), str(index+1), fill=0x000000)
-            draw.text((x*tw+ox, y*th+oy), str(index+1), fill=0xffffff)
+            text_x = x * tw + ox
+            text_y = y * th + oy
+            draw.text((text_x, text_y - 1), str(index+1), fill=0x000000)
+            draw.text((text_x, text_y + 1), str(index+1), fill=0x000000)
+            draw.text((text_x - 1, text_y), str(index+1), fill=0x000000)
+            draw.text((text_x + 1, text_y), str(index+1), fill=0x000000)
+            draw.text((text_x, text_y), str(index+1), fill=0xffffff)
     del draw
-
 
     print colorCount
     if colorCount != "":
