@@ -67,7 +67,7 @@ def findMatchingColor(color):
     return closest
 
 
-def generate(im, size, offset, dest, colorCount, mirror):
+def generate(im, size, dest, colorCount, mirror):
     width = size[0]
     height = size[1]
     pw = im.size[0] / width
@@ -77,8 +77,6 @@ def generate(im, size, offset, dest, colorCount, mirror):
         pw = ph
     if pw < ph:
         ph = pw
-
-    print "Using the area %s->%s" % (str(offset), str((offset[0]+width*pw, offset[1]+height*ph)))
 
     tw = 22
     th = 22
@@ -137,7 +135,7 @@ def generate(im, size, offset, dest, colorCount, mirror):
 def help():
     print "gPearl 1.0, 2009, http://static.slackers.se/pages/gpearls/"
     print ""
-    print "Usage gPearl [-s size] [-o offset] [-d dest] <IMAGE>"
+    print "Usage gPearl [-s size] [-d dest] <IMAGE>"
     print ""
     print "  -h, --help       This help screen."
     print "  -s, --size       The size of the pearlplate (default is 30x30)."
@@ -160,7 +158,7 @@ def parse(v):
         sys.exit(-1)
 
 try:
-    optlist, args = getopt.getopt(sys.argv[1:], 'mhs:o:d:c:', ['help', 'size=', 'offset=', 'dest=', 'colorcount=', 'mirror'])
+    optlist, args = getopt.getopt(sys.argv[1:], 'mhs:d:c:', ['help', 'size=', 'dest=', 'colorcount=', 'mirror'])
 
     if len(args) != 1:
         help()
@@ -168,7 +166,6 @@ try:
 # Default values
     image = args[0]
     size = (30, 30)
-    offset = (0, 0)
     dest = None
     colorCount = ""
     mirror = False
@@ -178,8 +175,6 @@ try:
             help()
         if k in ('-s', '--size'):
             size = parse(v)
-        if k in ('-o', '--offset'):
-            offset = parse(v)
         if k in ('-d', '--dest'):
             dest = v
         if k in ('-c', '--colorcount'):
@@ -189,13 +184,12 @@ try:
 
     print "Using image: " + image
     print "  Size: " + str(size)
-    print "  Offset: " + str(offset)
     if dest:
         print "  Destination file: " + dest
 
 
     im = Image.open(image)
-    generate(im, size, offset, dest, colorCount, mirror)
+    generate(im, size, dest, colorCount, mirror)
 except Exception, e:
     print "Error: ", e
     help()
